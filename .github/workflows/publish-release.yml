@@ -1,0 +1,18 @@
+name: Publish APK Release
+on:
+  push:
+    tags:
+      - '10'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release create 10 AutoLoginGarena-v1.0.10-debug.apk --title "1.0.10" --notes "Auto Login Garena 1.0.10"
