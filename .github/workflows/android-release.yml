@@ -1,0 +1,74 @@
+name: Build and publish Android release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-source
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Prepare release file and notes
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          apk="AutoLoginGarena-v${tag}-debug.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "../${apk}"
+          {
+            echo "## Auto Login Garena ${tag}"
+            echo
+            echo "APK được GitHub Actions tự động build và tải lên từ tag ${tag}."
+            echo
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Loại build: Debug"
+            echo "- Android tối thiểu: 8.0 (API 26)"
+          } > ../release-notes.md
+
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoLoginGarena-${{ github.ref_name }}
+          path: AutoLoginGarena-v${{ github.ref_name }}-debug.apk
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        working-directory: .
+        shell: bash
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "AutoLoginGarena-v${GITHUB_REF_NAME}-debug.apk" \
+            --title "Auto Login Garena ${GITHUB_REF_NAME}" \
+            --notes-file release-notes.md \
+            --latest
