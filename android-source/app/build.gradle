@@ -1,0 +1,10 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'vn.codex.garenapopup'
+    buildFeatures { buildConfig true }
+    compileSdk 35
+    defaultConfig { applicationId 'vn.codex.garenapopup'; minSdk 26; targetSdk 28; versionCode 27; versionName '2.7.0' }
+}
+
+
