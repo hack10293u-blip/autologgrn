@@ -4,7 +4,7 @@ android {
     namespace 'vn.codex.garenapopup'
     buildFeatures { buildConfig true }
     compileSdk 35
-    defaultConfig { applicationId 'vn.codex.garenapopup'; minSdk 26; targetSdk 28; versionCode 38; versionName '2.9.0' }
+    defaultConfig { applicationId 'vn.codex.garenapopup'; minSdk 26; targetSdk 28; versionCode 39; versionName '2.9.1' }
 }
 
 
